@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Trianguinity • Formula’s & Examples</title>
+<style>
+  :root{--bg:#0e1116;--panel:#151a23;--text:#e7edf3;--muted:#9fb0c6;--accent:#4cc9f0;--yellow:#ffd166;--border:#273246}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui, Segoe UI, Roboto, Arial, sans-serif;background:linear-gradient(180deg,#0b0f16,#0e1116 120px);color:var(--text)}
+  header{
+    position:sticky;top:0;z-index:10;background:#0f1420e6;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:16px;padding:12px 16px;backdrop-filter:blur(6px)
+  }
+  .brand{font-weight:800;letter-spacing:1px;color:#cfe8ff}
+  .chip{display:inline-block;padding:6px 10px;border-radius:10px;border:1px solid var(--border);background:#121722;color:var(--muted);text-decoration:none}
+  main{max-width:980px;margin:22px auto;padding:0 16px 40px}
+  h1{font-size:28px;margin:6px 0 4px}
+  h2{font-size:20px;margin:24px 0 8px}
+  p{color:var(--muted)}
+  .card{background:#0f1420;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .grid{display:grid;gap:12px}
+  @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
+  code, .k{color:var(--yellow)}
+  .eq{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;color:#e6f4ff}
+  .ex{border-left:3px solid #21314b;padding-left:10px;margin-top:6px}
+  footer{margin-top:30px;color:var(--muted);font-size:12px}
+  .toc{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+  .toc a{color:#b8dfff;text-decoration:none;border:1px solid var(--border);padding:4px 8px;border-radius:8px;background:#121722}
+  .toc a:hover{color:var(--accent);border-color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">[ Trianguinity ]</div>
+  <a class="chip" href="./index.html">← Back to App</a>
+  <span style="margin-left:auto" class="chip">Formula’s & Examples</span>
+</header>
+
+<main>
+  <h1>Formula’s for Coordinate Geometry & Triangles</h1>
+  <p>Quick reference for the formulas used in Trianguinity, with short explanations and worked examples.</p>
+
+  <div class="toc">
+    <a href="#distance">Distance</a>
+    <a href="#midpoint">Midpoint</a>
+    <a href="#slope">Slope</a>
+    <a href="#line-forms">Line Forms</a>
+    <a href="#triangle-area">Triangle Area</a>
+    <a href="#perimeter">Perimeter</a>
+    <a href="#pythagorean">Pythagorean / Right Test</a>
+    <a href="#isosceles">Isosceles Test</a>
+    <a href="#angles">Angles (Law of Cosines)</a>
+  </div>
+
+  <!-- Distance -->
+  <section id="distance" class="card">
+    <h2>Distance between two points</h2>
+    <div class="grid">
+      <div>
+        <div class="eq">d(P,Q) = √[(x₂ − x₁)² + (y₂ − y₁)²]</div>
+        <p>Derived from the Pythagorean theorem on the horizontal and vertical legs between points.</p>
+      </div>
+      <div class="ex">
+        <b>Example:</b> P(−2, 1), Q(3, 5)<br/>
+        d = √[(3 − (−2))² + (5 − 1)²] = √[(5)² + (4)²] = √41 ≈ <span class="k">6.403</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Midpoint -->
+  <section id="midpoint" class="card">
+    <h2>Midpoint</h2>
+    <div class="grid">
+      <div>
+        <div class="eq">M = ( (x₁ + x₂)/2 , (y₁ + y₂)/2 )</div>
+        <p>The average of x‑coordinates and y‑coordinates.</p>
+      </div>
+      <div class="ex">
+        <b>Example:</b> A(2, −3), B(6, 5) ⇒ M = ( (2+6)/2 , (−3+5)/2 ) = (4, 1)
+      </div>
+    </div>
+  </section>
+
+  <!-- Slope -->
+  <section id="slope" class="card">
+    <h2>Slope</h2>
+    <div class="grid">
+      <div>
+        <div class="eq">m = (y₂ − y₁) / (x₂ − x₁)</div>
+        <p>Rise over run. Undefined when x₂ = x₁ (vertical line).</p>
+      </div>
+      <div class="ex">
+        <b>Example:</b> P(−1, 4), Q(3, 2) ⇒ m = (2 − 4) / (3 − (−1)) = −2 / 4 = −1/2
+      </div>
+    </div>
+  </section>
+
+  <!-- Line forms -->
+  <section id="line-forms" class="card">
+    <h2>Equation of a Line (Common Forms)</h2>
+    <div class="grid">
+      <div>
+        <div class="eq">Slope–intercept: y = mx + b</div>
+        <p>m is slope, b is y‑intercept.</p>
+        <div class="eq">Point–slope: y − y₁ = m(x − x₁)</div>
+        <p>Through (x₁,y₁) with slope m.</p>
+        <div class="eq">Standard: Ax + By = C</div>
+        <p>Usually A, B, C integers; B ≥ 0 by convention.</p>
+      </div>
+      <div class="ex">
+        <b>Example:</b> Through (2,1) slope 3 → point–slope: y − 1 = 3(x − 2).  
+        Expand: y = 3x − 5 (slope–intercept).  
+        Standard: 3x − y = 5.
+      </div>
+    </div>
+  </section>
+
+  <!-- Triangle area -->
+  <section id="triangle-area" class="card">
+    <h2>Area of a Triangle from Coordinates</h2>
+    <div class="grid">
+      <div>
+        <div class="eq">
+          Area = ½ | x₁(y₂ − y₃) + x₂(y₃ − y₁) + x₃(y₁ − y₂) |
+        </div>
+        <p>This is the <i>shoelace formula</i>; zero area means the points are collinear (no triangle).</p>
+      </div>
+      <div class="ex">
+        <b>Example:</b> A(0,0), B(4,0), C(1,3)  
+        Area = ½ | 0(0 − 3) + 4(3 − 0) + 1(0 − 0) | = ½ · 12 = <span class="k">6</span>.
+      </div>
+    </div>
+  </section>
+
+  <!-- Perimeter -->
+  <section id="perimeter" class="card">
+    <h2>Perimeter of a Triangle</h2>
+    <div class="grid">
+      <div>
+        <div class="eq">P = AB + BC + CA</div>
+        <p>Compute each side with the distance formula and sum them.</p>
+      </div>
+      <div class="ex">
+        <b>Example:</b> A(0,0), B(3,0), C(0,4) ⇒ AB=3, BC=5, CA=4 → P = <span class="k">12</span>.
+      </div>
+    </div>
+  </section>
+
+  <!-- Pythagorean -->
+  <section id="pythagorean" class="card">
+    <h2>Pythagorean Theorem & Right‑Triangle Test</h2>
+    <div class="grid">
+      <div>
+        <div class="eq">a² + b² = c²</div>
+        <p>For sides a ≤ b ≤ c (c is the longest).  
+           If a² + b² = c² ⇒ right triangle; &lt; c² ⇒ obtuse; &gt; c² ⇒ acute.</p>
+      </div>
+      <div class="ex">
+        <b>Example:</b> sides 3,4,5 → 3²+4²=9+16=25=5² → right triangle.
+      </div>
+    </div>
+  </section>
+
+  <!-- Isosceles -->
+  <section id="isosceles" class="card">
+    <h2>Isosceles Test</h2>
+    <div class="grid">
+      <div>
+        <p>Triangle is <b>isosceles</b> if at least two sides are equal:  
+          AB = BC or BC = CA or CA = AB (within a small measurement tolerance).</p>
+      </div>
+      <div class="ex">
+        <b>Example:</b> If AB = 5, BC = 5, CA = 7 ⇒ isosceles (legs AB and BC).
+      </div>
+    </div>
+  </section>
+
+  <!-- Angles -->
+  <section id="angles" class="card">
+    <h2>Angles via Law of Cosines</h2>
+    <div class="grid">
+      <div>
+        <div class="eq">cos(α) = (b² + c² − a²) / (2bc)</div>
+        <div class="eq">cos(β) = (a² + c² − b²) / (2ac)</div>
+        <div class="eq">cos(γ) = (a² + b² − c²) / (2ab)</div>
+        <p>Where a, b, c are sides opposite angles α, β, γ respectively.</p>
+      </div>
+      <div class="ex">
+        <b>Example:</b> For sides a=5, b=6, c=7  
+        cos(γ) = (5² + 6² − 7²) / (2·5·6) = (25 + 36 − 49)/60 = 12/60 = 0.2 → γ ≈ <span class="k">78.46°</span>.
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Tip: In the app, toggle <i>Snap</i> to get integer coordinates, which makes distances and areas come out nicely.
+  </footer>
+</main>
+</body>
+</html>
