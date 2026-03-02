@@ -22,7 +22,7 @@
     background:#0c0f14;border:1px solid #1e2633;width:100%;max-width:900px;
     aspect-ratio:16/10;border-radius:10px;touch-action:none;
   }
-  /* ===== BRAND (Top-left) ===== */
+  /* Brand (top-left) */
   .brand{
     position:absolute;left:28px;top:18px;z-index:10;font-weight:800;letter-spacing:1px;
     background:linear-gradient(90deg,#a0c4ff,#4cc9f0,#ffd166);
@@ -30,15 +30,15 @@
     text-shadow:0 2px 16px rgba(76,201,240,.25);
     font-size:clamp(18px,2.2vw,24px);
   }
-  /* ===== NEW: Top-middle Formula's button ===== */
+  /* Top‑middle button */
   .top-center{
-    position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:10;
+    position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:10;
   }
   .btn{background:#1c2431;border:1px solid var(--border);color:var(--text);
-       padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+       padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;text-decoration:none;display:inline-block}
   .btn:hover{border-color:var(--accent);color:var(--accent)}
-  .ghost{background:transparent}
-  /* ===== Overlay cards (bottom-left) ===== */
+  .ghost{background:rgba(18,23,34,.5)}
+  /* Bottom‑left cards */
   .overlay{position:absolute;left:24px;bottom:24px;z-index:9;display:grid;gap:10px;width:min(420px,45vw)}
   .card{background:var(--card);border:1px solid var(--border);padding:12px;border-radius:12px;backdrop-filter:blur(6px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
   .card h3{margin:0 0 8px;font-size:16px}
@@ -55,6 +55,10 @@
   .results .ok{color:var(--ok);font-weight:700}.results .no{color:var(--danger);font-weight:700}
   .metric{display:grid;grid-template-columns:120px 1fr;gap:8px;margin:6px 0}
   .hr{border:0;border-top:1px solid var(--border);margin:10px 0}
+  .input{
+    flex:1;min-width:180px;padding:8px 10px;border-radius:8px;
+    border:1px solid var(--border);background:#0e1320;color:var(--text)
+  }
 </style>
 </head>
 <body>
@@ -62,17 +66,17 @@
     <!-- Brand -->
     <div class="brand">[ Trianguinity ]</div>
 
-    <!-- ===== NEW: Top-middle button that opens formulas.html ===== -->
+    <!-- ✅ Fixed: top‑middle button linking to formulas.html -->
     <div class="top-center">
-      <a class="btn ghost" href="./formulas.html" target="_blank" rel="noopener noreferrer">[ Formula’s ]</a>
+      <a class="btn ghost" href="./formulas.html" target="_blank" rel="noopener">[ Formula’s ]</a>
     </div>
 
     <!-- Canvas -->
     <canvas id="board" width="1280" height="800" aria-label="Interactive coordinate grid"></canvas>
 
-    <!-- Bottom-left overlays (quiz + calculator) -->
+    <!-- Bottom-left overlays -->
     <div class="overlay">
-      <!-- Quiz -->
+      <!-- Quiz Card -->
       <section class="card" id="quizCard">
         <div class="row" style="justify-content: space-between; align-items: baseline;">
           <h3>Quiz (10 items)</h3>
@@ -88,7 +92,7 @@
         </div>
       </section>
 
-      <!-- Calculator -->
+      <!-- Calculator Card -->
       <section class="card" id="calcCard">
         <h3>Equation Solver</h3>
         <div class="small">
@@ -96,7 +100,7 @@
           • Or evaluate numeric expressions (e.g., <code>3*(2+5)/7 + 1.25</code>)
         </div>
         <div class="row" style="margin-top:8px;">
-          <input type="text" id="calcInput" placeholder="Enter equation or expression…" style="flex:1;min-width:180px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:#0e1320;color:var(--text)" />
+          <input type="text" id="calcInput" class="input" placeholder="Enter equation or expression…" />
           <button class="btn" id="calcSolveBtn">Solve</button>
         </div>
         <div class="small" style="margin-top:6px;">
@@ -112,7 +116,7 @@
     <p>Click on the grid to place up to <b>3 points</b>: <b>A</b>, <b>B</b>, <b>C</b>. Toggle <i>Snap</i> for exact integer coordinates.</p>
     <div class="controls">
       <button id="undoBtn" class="btn" title="Remove the last point">Undo</button>
-      <button id="clearBtn" class="btn" title="Remove all points" style="border-color:#3a2a2a">Clear</button>
+      <button id="clearBtn" class="btn" title="Remove all points">Clear</button>
       <label class="pill" title="Snap to integer grid"><input type="checkbox" id="snapChk" /> Snap</label>
     </div>
 
@@ -141,139 +145,11 @@
   </aside>
 
 <script>
-/* ===== Your existing JS (grid, interaction, quiz, calculator) remains the same.
-   I’m keeping only the functional parts and trimmed comments to keep this reply short.
-   If you already have my previous version, you can reuse that JS unchanged. ===== */
+(function() {
+  // ======== Canvas & Grid ========
+  const canvas = document.getElementById('board');
+  const ctx = canvas.getContext('2d');
+  const scale = 40;
+  let origin = { x: canvas.width / 2, y: canvas.height / 2 };
 
-(function(){
-  const canvas=document.getElementById('board'); const ctx=canvas.getContext('2d');
-  const scale=40; let origin={x:canvas.width/2,y:canvas.height/2};
-  const grid={minor:scale,majorEvery:5,colorMinor:'#132032',colorMajor:'#1c2a40',colorAxes:'#2e3e5a'};
-  const colors={A:'#ff595e',B:'#8ac926',C:'#1982c4',edge:'#a7b4c7',text:'#e7edf3',shadow:'rgba(0,0,0,.35)'};
-  const pointRadius=6, hitRadiusPx=12;
-  const state={points:[],draggingIdx:-1,snap:false};
-  const mathToCanvas=({x,y})=>({x:origin.x+x*scale,y:origin.y-y*scale});
-  const canvasToMath=({x,y})=>({x:(x-origin.x)/scale,y:(origin.y-y)/scale});
-
-  function drawGrid(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle='#0c0f14';ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.lineWidth=1;
-    for(const dir of ['x','y']){
-      const max=dir==='x'?canvas.width:canvas.height;
-      const originPx=dir==='x'?origin.x:origin.y;
-      const count=Math.ceil(max/grid.minor)+2;
-      for(let i=-count;i<=count;i++){
-        const pos=Math.round(originPx+i*grid.minor);
-        const isMajor=(i%grid.majorEvery===0);
-        ctx.strokeStyle=isMajor?grid.colorMajor:grid.colorMinor;
-        ctx.beginPath();
-        if(dir==='x'){ctx.moveTo(pos,0);ctx.lineTo(pos,canvas.height);}
-        else{ctx.moveTo(0,pos);ctx.lineTo(canvas.width,pos);}
-        ctx.stroke();
-      }
-    }
-    ctx.strokeStyle=grid.colorAxes;ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(origin.x,0);ctx.lineTo(origin.x,canvas.height);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(0,origin.y);ctx.lineTo(canvas.width,origin.y);ctx.stroke();
-    ctx.fillStyle=colors.text;ctx.font='12px system-ui, Segoe UI, Roboto, Arial, sans-serif';
-    ctx.textAlign='center';ctx.textBaseline='top';
-    const unitsX=Math.floor(canvas.width/scale/2);
-    for(let ux=-unitsX;ux<=unitsX;ux++){ if(ux===0)continue;
-      const px=mathToCanvas({x:ux,y:0}).x; if(ux%grid.majorEvery===0)ctx.fillText(String(ux),px,origin.y+4);
-    }
-    ctx.textAlign='right';ctx.textBaseline='middle';
-    const unitsY=Math.floor(canvas.height/scale/2);
-    for(let uy=-unitsY;uy<=unitsY;uy++){ if(uy===0)continue;
-      const py=mathToCanvas({x:0,y:uy}).y; if(uy%grid.majorEvery===0)ctx.fillText(String(uy),origin.x-4,py);
-    }
-  }
-
-  function drawPointsAndEdges(){
-    const pts=state.points;
-    if(pts.length>=2){
-      ctx.strokeStyle=colors.edge;ctx.lineWidth=2.5;ctx.beginPath();
-      const p0=mathToCanvas(pts[0]);ctx.moveTo(p0.x,p0.y);
-      for(let i=1;i<pts.length;i++){const pi=mathToCanvas(pts[i]);ctx.lineTo(pi.x,pi.y);}
-      if(pts.length===3){const p0a=mathToCanvas(pts[0]);ctx.lineTo(p0a.x,p0a.y)} ctx.stroke();
-    }
-    const labels=['A','B','C']; const labelColors={A:colors.A,B:colors.B,C:colors.C};
-    for(let i=0;i<pts.length;i++){
-      const p=mathToCanvas(pts[i]); const label=labels[i]; const fill=labelColors[label];
-      ctx.save();ctx.shadowColor=colors.shadow;ctx.shadowBlur=8;
-      ctx.beginPath();ctx.arc(p.x,p.y,pointRadius,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();ctx.restore();
-      ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,pointRadius,0,Math.PI*2);ctx.stroke();
-      ctx.fillStyle=fill;ctx.font='bold 14px system-ui, Segoe UI, Roboto, Arial, sans-serif';
-      ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(label,p.x,p.y-8);
-    }
-  }
-
-  const dist=(p,q)=>Math.hypot(p.x-q.x,p.y-q.y);
-  function areaTriangle(A,B,C){return 0.5*Math.abs(A.x*(B.y-C.y)+B.x*(C.y-A.y)+C.x*(A.y-B.y))}
-  function classifyTriangle(A,B,C){
-    const AB=dist(A,B),BC=dist(B,C),CA=dist(C,A); const sides=[AB,BC,CA].sort((a,b)=>a-b); const [a,b,c]=sides;
-    const area=areaTriangle(A,B,C); const epsLen=Math.max(1e-6,1e-6*c), epsArea=Math.max(1e-9,1e-6*a*b);
-    const isTriangle=area>epsArea; if(!isTriangle) return {isTriangle:false,type:'Not a triangle',sides:{AB,BC,CA},area:0};
-    const eq=(x,y)=>Math.abs(x-y)<=epsLen; const isRight=Math.abs(a*a+b*b-c*c)<=Math.max(1e-6,1e-6*c*c);
-    const isEquilateral=eq(AB,BC)&&eq(BC,CA); const isIsosceles=isEquilateral||eq(AB,BC)||eq(BC,CA)||eq(CA,AB);
-    let type='Scalene'; if(isEquilateral) type='Equilateral'; else if(isIsosceles) type='Isosceles';
-    if(isRight && !isEquilateral) type=(type==='Isosceles')?'Right Isosceles':'Right';
-    return {isTriangle:true,type,sides:{AB,BC,CA},area}
-  }
-
-  const resultsEl=document.getElementById('results'); const fmt=n=>Number.isFinite(n)?n.toFixed(3):'—';
-  function updateResults(){
-    const labs=['A','B','C']; const coords=labs.map((lab,i)=>{const p=state.points[i];
-      return `<div class="metric"><div><b>${lab}</b>:</div><div>${p?`(${fmt(p.x)}, ${fmt(p.y)})`:'(—, —)'}</div></div>`}).join('');
-    let tri=`<div class="metric"><div>Triangle?</div><div>—</div></div>`;
-    let typ=`<div class="metric"><div>Type</div><div>—</div></div>`;
-    let lens=`<div class="metric"><div>Side lengths</div><div>—</div></div>`;
-    let area=`<div class="metric"><div>Area</div><div>—</div></div>`;
-    if(state.points.length===3){
-      const [A,B,C]=state.points; const res=classifyTriangle(A,B,C);
-      tri=`<div class="metric"><div>Triangle?</div><div>${res.isTriangle?'<span class="ok">Yes</span>':'<span class="no">No</span>'}</div></div>`;
-      typ=`<div class="metric"><div>Type</div><div>${res.type}</div></div>`;
-      lens=`<div class="metric"><div>Side lengths</div><div>AB=${fmt(res.sides.AB)}, BC=${fmt(res.sides.BC)}, CA=${fmt(res.sides.CA)}</div></div>`;
-      area=`<div class="metric"><div>Area</div><div>${fmt(res.area)}</div></div>`;
-    }
-    resultsEl.innerHTML=`${coords}<hr class="hr" />${tri}${typ}${lens}${area}`;
-  }
-
-  function getMousePos(evt){const r=canvas.getBoundingClientRect();return {x:(evt.clientX-r.left)*(canvas.width/r.width),y:(evt.clientY-r.top)*(canvas.height/r.height)}}
-  function nearestPointIndex(mouse){for(let i=0;i<state.points.length;i++){const p=mathToCanvas(state.points[i]); if(Math.hypot(p.x-mouse.x,p.y-mouse.y)<=hitRadiusPx) return i} return -1}
-  function placeOrStartDrag(evt){
-    const mouse=getMousePos(evt); const idx=nearestPointIndex(mouse);
-    if(idx>=0){state.draggingIdx=idx;return}
-    if(state.points.length>=3)return;
-    let m=canvasToMath(mouse); m=state.snap?{x:Math.round(m.x),y:Math.round(m.y)}:{x:Math.round(m.x*1000)/1000,y:Math.round(m.y*1000)/1000};
-    state.points.push(m); redraw();
-  }
-  function drag(evt){ if(state.draggingIdx<0)return; const mouse=getMousePos(evt); let m=canvasToMath(mouse);
-    m=state.snap?{x:Math.round(m.x),y:Math.round(m.y)}:{x:Math.round(m.x*1000)/1000,y:Math.round(m.y*1000)/1000};
-    state.points[state.draggingIdx]=m; redraw();
-  }
-  function endDrag(){state.draggingIdx=-1}
-  function redraw(){drawGrid();drawPointsAndEdges();updateResults()}
-
-  document.getElementById('undoBtn').addEventListener('click',()=>{state.points.pop();redraw()});
-  document.getElementById('clearBtn').addEventListener('click',()=>{state.points=[];redraw()});
-  document.getElementById('snapChk').addEventListener('change',e=>state.snap=e.target.checked);
-  canvas.addEventListener('mousedown',placeOrStartDrag); window.addEventListener('mousemove',drag); window.addEventListener('mouseup',endDrag);
-  canvas.addEventListener('touchstart',e=>{e.preventDefault();placeOrStartDrag(e.changedTouches[0])},{passive:false});
-  window.addEventListener('touchmove',e=>{e.preventDefault();drag(e.changedTouches[0])},{passive:false});
-  window.addEventListener('touchend',e=>{e.preventDefault();endDrag()},{passive:false});
-
-  redraw();
-  const ro=new ResizeObserver(()=>{const rect=canvas.getBoundingClientRect();const dpr=window.devicePixelRatio||1;
-    const needW=Math.round(rect.width*dpr),needH=Math.round(rect.height*dpr);
-    if(canvas.width!==needW||canvas.height!==needH){canvas.width=needW;canvas.height=needH;origin={x:canvas.width/2,y:canvas.height/2};redraw()}
-  }); ro.observe(canvas);
-
-  // ===== Quiz + Calculator modules (same as previous you already have) =====
-  // ... (Keep your previous quiz & calculator JS; omitted here for brevity)
-})();
-</script>
-</body>
-
-</html>
 
